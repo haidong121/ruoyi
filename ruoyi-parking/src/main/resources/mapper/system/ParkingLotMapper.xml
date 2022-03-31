@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.parking.lot.mapper.ParkingLotMapper">
+    
+    <resultMap type="ParkingLot" id="ParkingLotResult">
+        <result property="lotId"    column="lot_id"    />
+        <result property="lotName"    column="lot_name"    />
+        <result property="shortName"    column="short_name"    />
+        <result property="cityId"    column="city_id"    />
+        <result property="address"    column="address"    />
+        <result property="placeNum"    column="place_num"    />
+        <result property="lotStyle"    column="lot_style"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="city"    column="city_id" javaType="SysCity" resultMap="SysCityResult" />
+    </resultMap>
+
+    <resultMap type="SysCity" id="SysCityResult">
+        <result property="cityId"    column="city_id"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="ancestors"    column="ancestors"    />
+        <result property="cityName"    column="city_name"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+
+    <sql id="selectParkingLotVo">
+        select p.lot_id, p.lot_name, p.short_name, p.city_id, p.address, p.place_num, p.lot_style, p.order_num, p.build_time, p.status,
+        p.del_flag, p.create_by, p.create_time, p.update_by, p.update_time,t.city_name
+        from parking_lot p
+            left join sys_city  t on p.city_id = t.city_id
+    </sql>
+
+    <select id="selectParkingLotList" parameterType="ParkingLot" resultMap="ParkingLotResult">
+        <include refid="selectParkingLotVo"/>
+        <where>  
+            <if test="lotName != null  and lotName != ''"> and lot_name like concat('%', #{lotName}, '%')</if>
+            <if test="shortName != null  and shortName != ''"> and short_name like concat('%', #{shortName}, '%')</if>
+            <if test="cityId != null "> and p.city_id = #{cityId}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="placeNum != null "> and place_num = #{placeNum}</if>
+            <if test="lotStyle != null "> and lot_style = #{lotStyle}</if>
+            <if test="orderNum != null "> and p.order_num = #{orderNum}</if>
+            <if test="buildTime != null "> and p.build_time = #{buildTime}</if>
+            <if test="status != null  and status != ''"> and p.status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectParkingLotByLotId" parameterType="Long" resultMap="ParkingLotResult">
+        <include refid="selectParkingLotVo"/>
+        where lot_id = #{lotId}
+    </select>
+        
+    <insert id="insertParkingLot" parameterType="ParkingLot" useGeneratedKeys="true" keyProperty="lotId">
+        insert into parking_lot
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lotName != null">lot_name,</if>
+            <if test="shortName != null">short_name,</if>
+            <if test="cityId != null">city_id,</if>
+            <if test="address != null">address,</if>
+            <if test="placeNum != null">place_num,</if>
+            <if test="lotStyle != null">lot_style,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lotName != null">#{lotName},</if>
+            <if test="shortName != null">#{shortName},</if>
+            <if test="cityId != null">#{cityId},</if>
+            <if test="address != null">#{address},</if>
+            <if test="placeNum != null">#{placeNum},</if>
+            <if test="lotStyle != null">#{lotStyle},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateParkingLot" parameterType="ParkingLot">
+        update parking_lot
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="lotName != null">lot_name = #{lotName},</if>
+            <if test="shortName != null">short_name = #{shortName},</if>
+            <if test="cityId != null">city_id = #{cityId},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="placeNum != null">place_num = #{placeNum},</if>
+            <if test="lotStyle != null">lot_style = #{lotStyle},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where lot_id = #{lotId}
+    </update>
+
+    <delete id="deleteParkingLotByLotId" parameterType="Long">
+        delete from parking_lot where lot_id = #{lotId}
+    </delete>
+
+    <delete id="deleteParkingLotByLotIds" parameterType="String">
+        delete from parking_lot where lot_id in 
+        <foreach item="lotId" collection="array" open="(" separator="," close=")">
+            #{lotId}
+        </foreach>
+    </delete>
+</mapper>
