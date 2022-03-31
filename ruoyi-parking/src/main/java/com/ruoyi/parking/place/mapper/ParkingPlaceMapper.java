@@ -7,7 +7,7 @@ import com.ruoyi.parking.place.domain.ParkingPlace;
  * 车位管理Mapper接口
  * 
  * @author zhd
- * @date 2022-03-25
+ * @date 2022-03-31
  */
 public interface ParkingPlaceMapper 
 {

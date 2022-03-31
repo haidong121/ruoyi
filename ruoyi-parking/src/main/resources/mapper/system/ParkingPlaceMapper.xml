@@ -7,7 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="ParkingPlace" id="ParkingPlaceResult">
         <result property="placeId"    column="place_id"    />
         <result property="lotId"    column="lot_id"    />
-        <result property="cityId"    column="city_id"    />
+        <result property="areaId"    column="area_id"    />
         <result property="equipmentType"    column="equipment_type"    />
         <result property="equipmentSncode"    column="equipment_SNcode"    />
         <result property="bindDate"    column="bind_date"    />
@@ -17,8 +17,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
-        <association property="city"    column="city_id" javaType="SysCity" resultMap="SysCityResult" />
         <association property="lot"    column="lot_id" javaType="ParkingLot" resultMap="ParkingLotResult" />
+        <association property="area"    column="area_id" javaType="ParkingArea" resultMap="ParkingAreaResult" />
     </resultMap>
 
     <resultMap type="ParkingLot" id="ParkingLotResult">
@@ -40,50 +40,51 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <association property="city"    column="city_id" javaType="SysCity" resultMap="SysCityResult" />
     </resultMap>
 
-    <resultMap type="SysCity" id="SysCityResult">
+    <resultMap type="ParkingArea" id="ParkingAreaResult">
+        <result property="areaId"    column="area_id"    />
+        <result property="lotId"    column="lot_id"    />
         <result property="cityId"    column="city_id"    />
-        <result property="parentId"    column="parent_id"    />
-        <result property="ancestors"    column="ancestors"    />
-        <result property="cityName"    column="city_name"    />
+        <result property="placeNum"    column="place_num"    />
         <result property="orderNum"    column="order_num"    />
         <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
+        <association property="lot"    column="lot_id" javaType="ParkingLot" resultMap="ParkingLotResult" />
     </resultMap>
 
     <sql id="selectParkingPlaceVo">
-        select p.place_id, p.lot_id, p.city_id, p.equipment_type, p.equipment_SNcode, p.bind_date, p.place_type, p.place_property, p.create_by, p.create_time, p.update_by, p.update_time
-                c.city_id, l.lot_name
+        select p.place_id, p.lot_id, p.area_id, p.equipment_type, p.equipment_SNcode, p.bind_date, p.place_type, p.place_property, p.create_by, p.create_time,
+        p.update_by, p.update_time , a.area_name, l.lot_name
         from parking_place p
-                	left join sys_city c on p.city_id = c.city_id
-		            left join parking_lot l on p.lot_id = l.lot_id
+        		left join parking_area a on p.area_id = a.area_id
+		        left join parking_lot l on p.lot_id = l.lot_id
     </sql>
 
     <select id="selectParkingPlaceList" parameterType="ParkingPlace" resultMap="ParkingPlaceResult">
         <include refid="selectParkingPlaceVo"/>
         <where>  
             <if test="lotId != null "> and p.lot_id = #{lotId}</if>
-            <if test="cityId != null "> and p.city_id = #{cityId}</if>
-            <if test="equipmentType != null "> and p.equipment_type = #{equipmentType}</if>
-            <if test="equipmentSncode != null  and equipmentSncode != ''"> and p.equipment_SNcode = #{equipmentSncode}</if>
-            <if test="bindDate != null "> and p.bind_date = #{bindDate}</if>
-            <if test="placeType != null  and placeType != ''"> and p.place_type = #{placeType}</if>
-            <if test="placeProperty != null  and placeProperty != ''"> and p.place_property = #{placeProperty}</if>
+            <if test="areaId != null "> and p.area_id = #{areaId}</if>
+            <if test="equipmentType != null "> and equipment_type = #{equipmentType}</if>
+            <if test="equipmentSncode != null  and equipmentSncode != ''"> and equipment_SNcode = #{equipmentSncode}</if>
+            <if test="bindDate != null "> and bind_date = #{bindDate}</if>
+            <if test="placeType != null  and placeType != ''"> and place_type = #{placeType}</if>
+            <if test="placeProperty != null  and placeProperty != ''"> and place_property = #{placeProperty}</if>
         </where>
     </select>
     
     <select id="selectParkingPlaceByPlaceId" parameterType="Long" resultMap="ParkingPlaceResult">
         <include refid="selectParkingPlaceVo"/>
-        where place_id = #{placeId}
+        where p.place_id = #{placeId}
     </select>
         
     <insert id="insertParkingPlace" parameterType="ParkingPlace" useGeneratedKeys="true" keyProperty="placeId">
         insert into parking_place
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="lotId != null">lot_id,</if>
-            <if test="cityId != null">city_id,</if>
+            <if test="areaId != null">area_id,</if>
             <if test="equipmentType != null">equipment_type,</if>
             <if test="equipmentSncode != null">equipment_SNcode,</if>
             <if test="bindDate != null">bind_date,</if>
@@ -96,7 +97,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="lotId != null">#{lotId},</if>
-            <if test="cityId != null">#{cityId},</if>
+            <if test="areaId != null">#{areaId},</if>
             <if test="equipmentType != null">#{equipmentType},</if>
             <if test="equipmentSncode != null">#{equipmentSncode},</if>
             <if test="bindDate != null">#{bindDate},</if>
@@ -112,8 +113,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateParkingPlace" parameterType="ParkingPlace">
         update parking_place
         <trim prefix="SET" suffixOverrides=",">
-            <if test="lotId != null">lot_id = #{lotId},</if>
-            <if test="cityId != null">city_id = #{cityId},</if>
+            <if test="lotId != null">.lot_id = #{lotId},</if>
+            <if test="areaId != null">area_id = #{areaId},</if>
             <if test="equipmentType != null">equipment_type = #{equipmentType},</if>
             <if test="equipmentSncode != null">equipment_SNcode = #{equipmentSncode},</if>
             <if test="bindDate != null">bind_date = #{bindDate},</if>

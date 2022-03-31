@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="78px">
       <el-form-item label="所属车场" prop="lotId">
         <el-input
           v-model="queryParams.lotId"
@@ -9,9 +9,9 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="所属区域" prop="cityId">
+      <el-form-item label="所属区域" prop="areaId">
         <el-input
-          v-model="queryParams.cityId"
+          v-model="queryParams.areaId"
           placeholder="请输入所属区域"
           clearable
           @keyup.enter.native="handleQuery"
@@ -34,7 +34,7 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item label="泊位类型" prop="placeType">
-        <el-select v-model="queryParams.placeType" placeholder="请选择泊位类型(0小型车,1大型车)" clearable>
+        <el-select v-model="queryParams.placeType" placeholder="请选择泊位类型" clearable>
           <el-option
             v-for="dict in dict.type.place_type"
             :key="dict.value"
@@ -44,14 +44,12 @@
         </el-select>
       </el-form-item>
       <el-form-item label="泊位属性" prop="placeProperty">
-        <el-select v-model="queryParams.placeProperty" placeholder="请选择泊位属性(0公共,1专属)" clearable>
-          <el-option
-            v-for="dict in dict.type.place_property"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
+        <el-input
+          v-model="queryParams.placeProperty"
+          placeholder="请输入泊位属性"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -109,7 +107,7 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="车位编号" align="center" prop="placeId" />
       <el-table-column label="所属车场" align="center" prop="lotId" />
-      <el-table-column label="所属区域" align="center" prop="cityId" />
+      <el-table-column label="所属区域" align="center" prop="areaId" />
       <el-table-column label="设备类型" align="center" prop="equipmentType" />
       <el-table-column label="设备SN码" align="center" prop="equipmentSncode" />
       <el-table-column label="绑定时间" align="center" prop="bindDate" width="180">
@@ -158,17 +156,26 @@
     <!-- 添加或修改车位管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="所属车场" prop="lotId">
-          <el-input v-model="form.lotId" placeholder="请输入所属车场" />
+        <el-form-item label="所属车场" >
+          <el-select v-model="form.lotId" multiple placeholder="请选择所属车场" >
+            <el-option
+              v-for="item in lotList"
+              :key="item.lotId"
+              :label="item.lotName"
+              :value="item.lotId"
+              :disabled="item.status == 1"
+            ></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="所属区域" prop="cityId">
-          <el-input v-model="form.cityId" placeholder="请输入所属区域" />
+        <el-form-item label="所属区域" prop="areaId"  >
+          <el-input v-model="form.areaId"  placeholder="请输入所属区域" />
         </el-form-item>
         <el-form-item label="设备SN码" prop="equipmentSncode">
           <el-input v-model="form.equipmentSncode" placeholder="请输入设备SN码" />
         </el-form-item>
         <el-form-item label="绑定时间" prop="bindDate">
-          <el-date-picker clearable
+          <el-date-picker
+            clearable
             v-model="form.bindDate"
             type="date"
             value-format="yyyy-MM-dd"
@@ -176,22 +183,22 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="泊位类型" prop="placeType">
-          <el-select v-model="form.placeType" placeholder="请选择泊位类型(0小型车,1大型车)">
-            <el-option
-              v-for="dict in dict.type.place_type"
-              :key="dict.value"
-              :label="dict.label"
-:value="dict.value"
-            ></el-option>
-          </el-select>
+             <el-select v-model="form.placeType" placeholder="请选择泊位类型">
+               <el-option
+                 v-for="dict in dict.type.place_type"
+                 :key="dict.value"
+                 :label="dict.label"
+                 :value="dict.value"
+               ></el-option>
+             </el-select>
         </el-form-item>
         <el-form-item label="泊位属性" prop="placeProperty">
-          <el-select v-model="form.placeProperty" placeholder="请选择泊位属性(0公共,1专属)">
+          <el-select v-model="form.placeProperty" placeholder="请选择泊位属性">
             <el-option
               v-for="dict in dict.type.place_property"
               :key="dict.value"
               :label="dict.label"
-:value="dict.value"
+              :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -206,12 +213,15 @@
 
 <script>
 import { listPlace, getPlace, delPlace, addPlace, updatePlace } from "@/api/system/place";
+import { listLot } from "@/api/system/lot";
 
 export default {
   name: "Place",
-  dicts: ['place_type', 'place_property'],
+  dicts: ['place_type','place_property'],
   data() {
     return {
+      //车场列表
+      lotList:[],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -235,7 +245,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         lotId: null,
-        cityId: null,
+        areaId: null,
         equipmentType: null,
         equipmentSncode: null,
         bindDate: null,
@@ -251,8 +261,18 @@ export default {
   },
   created() {
     this.getList();
+    this.getLotList();
   },
   methods: {
+    /** 查询车场管理列表 */
+    getLotList() {
+      this.loading = true;
+      listLot(this.queryParams).then(response => {
+        this.lotList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
     /** 查询车位管理列表 */
     getList() {
       this.loading = true;
@@ -272,7 +292,7 @@ export default {
       this.form = {
         placeId: null,
         lotId: null,
-        cityId: null,
+        areaId: null,
         equipmentType: null,
         equipmentSncode: null,
         bindDate: null,
