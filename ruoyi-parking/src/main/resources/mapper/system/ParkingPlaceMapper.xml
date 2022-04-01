@@ -37,7 +37,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
-        <association property="city"    column="city_id" javaType="SysCity" resultMap="SysCityResult" />
     </resultMap>
 
     <resultMap type="ParkingArea" id="ParkingAreaResult">
@@ -51,7 +50,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
-        <association property="lot"    column="lot_id" javaType="ParkingLot" resultMap="ParkingLotResult" />
     </resultMap>
 
     <sql id="selectParkingPlaceVo">
@@ -113,7 +111,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateParkingPlace" parameterType="ParkingPlace">
         update parking_place
         <trim prefix="SET" suffixOverrides=",">
-            <if test="lotId != null">.lot_id = #{lotId},</if>
+            <if test="lotId != null">lot_id = #{lotId},</if>
             <if test="areaId != null">area_id = #{areaId},</if>
             <if test="equipmentType != null">equipment_type = #{equipmentType},</if>
             <if test="equipmentSncode != null">equipment_SNcode = #{equipmentSncode},</if>

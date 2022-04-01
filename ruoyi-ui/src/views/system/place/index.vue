@@ -106,8 +106,8 @@
     <el-table v-loading="loading" :data="placeList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="车位编号" align="center" prop="placeId" />
-      <el-table-column label="所属车场" align="center" prop="lotId" />
-      <el-table-column label="所属区域" align="center" prop="areaId" />
+      <el-table-column label="所属车场" align="center" prop="lot.lotName" />
+      <el-table-column label="所属区域" align="center" prop="area.areaName" />
       <el-table-column label="设备类型" align="center" prop="equipmentType" />
       <el-table-column label="设备SN码" align="center" prop="equipmentSncode" />
       <el-table-column label="绑定时间" align="center" prop="bindDate" width="180">
@@ -155,21 +155,29 @@
 
     <!-- 添加或修改车位管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px" >
         <el-form-item label="所属车场" >
-          <el-select v-model="form.lotId" multiple placeholder="请选择所属车场" >
+          <el-select v-model="form.lotId" @change="change(form.lotId)" placeholder="请选择所属车场" >
             <el-option
               v-for="item in lotList"
               :key="item.lotId"
               :label="item.lotName"
               :value="item.lotId"
-              :disabled="item.status == 1"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="所属区域" prop="areaId"  >
-          <el-input v-model="form.areaId"  placeholder="请输入所属区域" />
+
+        <el-form-item label="所属区域" >
+          <el-select v-model="form.areaId"    placeholder="请选择所属区域" >
+            <el-option
+              v-for="item in areaList"
+              :key="item.areaId"
+              :label="item.areaName"
+              :value="item.areaId"
+            ></el-option>
+          </el-select>
         </el-form-item>
+
         <el-form-item label="设备SN码" prop="equipmentSncode">
           <el-input v-model="form.equipmentSncode" placeholder="请输入设备SN码" />
         </el-form-item>
@@ -214,6 +222,7 @@
 <script>
 import { listPlace, getPlace, delPlace, addPlace, updatePlace } from "@/api/system/place";
 import { listLot } from "@/api/system/lot";
+import { getAreaByLot } from "@/api/system/area";
 
 export default {
   name: "Place",
@@ -222,6 +231,8 @@ export default {
     return {
       //车场列表
       lotList:[],
+      //区域列表
+      areaList:[],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -256,14 +267,30 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      }
+      },
+
     };
   },
   created() {
     this.getList();
     this.getLotList();
   },
+  watch: {
+    lotId(){
+      alert(1);
+    }
+  },
   methods: {
+    //新增车场值发生改变
+    change(val){
+      /** 查询区域管理列表 */
+      this.loading = true;
+      getAreaByLot(val).then(response => {
+        this.areaList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
     /** 查询车场管理列表 */
     getLotList() {
       this.loading = true;
@@ -273,11 +300,13 @@ export default {
         this.loading = false;
       });
     },
+
     /** 查询车位管理列表 */
     getList() {
       this.loading = true;
       listPlace(this.queryParams).then(response => {
         this.placeList = response.rows;
+        alert(JSON.stringify(this.placeList))
         this.total = response.total;
         this.loading = false;
       });

@@ -9,10 +9,10 @@ import com.ruoyi.parking.area.domain.ParkingArea;
 import com.ruoyi.parking.area.service.IParkingAreaService;
 
 /**
- * 区域管理Service业务层处理
+ * 区域Service业务层处理
  * 
  * @author zhd
- * @date 2022-03-24
+ * @date 2022-04-01
  */
 @Service
 public class ParkingAreaServiceImpl implements IParkingAreaService 
@@ -21,10 +21,10 @@ public class ParkingAreaServiceImpl implements IParkingAreaService
     private ParkingAreaMapper parkingAreaMapper;
 
     /**
-     * 查询区域管理
+     * 查询区域
      * 
-     * @param areaId 区域管理主键
-     * @return 区域管理
+     * @param areaId 区域主键
+     * @return 区域
      */
     @Override
     public ParkingArea selectParkingAreaByAreaId(Long areaId)
@@ -33,10 +33,10 @@ public class ParkingAreaServiceImpl implements IParkingAreaService
     }
 
     /**
-     * 查询区域管理列表
+     * 查询区域列表
      * 
-     * @param parkingArea 区域管理
-     * @return 区域管理
+     * @param parkingArea 区域
+     * @return 区域
      */
     @Override
     public List<ParkingArea> selectParkingAreaList(ParkingArea parkingArea)
@@ -45,9 +45,20 @@ public class ParkingAreaServiceImpl implements IParkingAreaService
     }
 
     /**
-     * 新增区域管理
+     * 查询区域列表
+     *
+     * @param lotId 区域
+     * @return 区域
+     */
+    @Override
+    public List<ParkingArea> selectParkingAreaByLotId(Long lotId) {
+        return parkingAreaMapper.selectParkingAreaByLotId(lotId);
+    }
+
+    /**
+     * 新增区域
      * 
-     * @param parkingArea 区域管理
+     * @param parkingArea 区域
      * @return 结果
      */
     @Override
@@ -58,9 +69,9 @@ public class ParkingAreaServiceImpl implements IParkingAreaService
     }
 
     /**
-     * 修改区域管理
+     * 修改区域
      * 
-     * @param parkingArea 区域管理
+     * @param parkingArea 区域
      * @return 结果
      */
     @Override
@@ -71,9 +82,9 @@ public class ParkingAreaServiceImpl implements IParkingAreaService
     }
 
     /**
-     * 批量删除区域管理
+     * 批量删除区域
      * 
-     * @param areaIds 需要删除的区域管理主键
+     * @param areaIds 需要删除的区域主键
      * @return 结果
      */
     @Override
@@ -83,9 +94,9 @@ public class ParkingAreaServiceImpl implements IParkingAreaService
     }
 
     /**
-     * 删除区域管理信息
+     * 删除区域信息
      * 
-     * @param areaId 区域管理主键
+     * @param areaId 区域主键
      * @return 结果
      */
     @Override

@@ -2,8 +2,7 @@ package com.ruoyi.parking.place.domain;
 
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.core.domain.entity.SysCity;
+
 import com.ruoyi.parking.area.domain.ParkingArea;
 import com.ruoyi.parking.lot.domain.ParkingLot;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -162,8 +161,8 @@ public class ParkingPlace extends BaseEntity
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
-                .append("lot", getLot())
-                .append("area", getArea())
+            .append("lot", getLot())
+            .append("area", getArea())
             .toString();
     }
 }

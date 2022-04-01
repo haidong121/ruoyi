@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="ParkingArea" id="ParkingAreaResult">
         <result property="areaId"    column="area_id"    />
+        <result property="areaName"    column="area_name"    />
         <result property="lotId"    column="lot_id"    />
         <result property="cityId"    column="city_id"    />
         <result property="placeNum"    column="place_num"    />
@@ -15,30 +16,59 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
+        <association property="lot"    column="lot_id" javaType="ParkingLot" resultMap="ParkingLotResult" />
+    </resultMap>
+
+    <resultMap type="ParkingLot" id="ParkingLotResult">
+        <result property="lotId"    column="lot_id"    />
+        <result property="lotName"    column="lot_name"    />
+        <result property="shortName"    column="short_name"    />
+        <result property="cityId"    column="city_id"    />
+        <result property="address"    column="address"    />
+        <result property="placeNum"    column="place_num"    />
+        <result property="lotStyle"    column="lot_style"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
     </resultMap>
 
     <sql id="selectParkingAreaVo">
-        select area_id, lot_id, city_id, place_num, order_num, del_flag, create_by, create_time, update_by, update_time from parking_area
+        select a.area_id, a.area_name, a.lot_id, a.city_id, a.place_num, a.order_num, a.del_flag, a.create_by, a.create_time, a.update_by, a.update_time,l.lot_name
+        from parking_area a
+        left join parking_lot l on l.lot_id = a.lot_id
+
     </sql>
 
     <select id="selectParkingAreaList" parameterType="ParkingArea" resultMap="ParkingAreaResult">
         <include refid="selectParkingAreaVo"/>
         <where>  
-            <if test="lotId != null  and lotId != ''"> and lot_id = #{lotId}</if>
+            <if test="areaName != null  and areaName != ''"> and area_name like concat('%', #{areaName}, '%')</if>
+            <if test="lotId != null  and lotId != ''"> and a.lot_id = #{lotId}</if>
             <if test="cityId != null "> and city_id = #{cityId}</if>
             <if test="placeNum != null "> and place_num = #{placeNum}</if>
             <if test="orderNum != null "> and order_num = #{orderNum}</if>
         </where>
     </select>
-    
+
+    <select id="selectParkingAreaByLotId" parameterType="Long" resultMap="ParkingAreaResult">
+        <include refid="selectParkingAreaVo"/>
+        where a.lot_id = #{lotId}
+    </select>
+
     <select id="selectParkingAreaByAreaId" parameterType="Long" resultMap="ParkingAreaResult">
         <include refid="selectParkingAreaVo"/>
-        where area_id = #{areaId}
+        where a.area_id = #{areaId}
     </select>
         
     <insert id="insertParkingArea" parameterType="ParkingArea" useGeneratedKeys="true" keyProperty="areaId">
         insert into parking_area
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="areaName != null">area_name,</if>
             <if test="lotId != null">lot_id,</if>
             <if test="cityId != null">city_id,</if>
             <if test="placeNum != null">place_num,</if>
@@ -50,6 +80,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateTime != null">update_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="areaName != null">#{areaName},</if>
             <if test="lotId != null">#{lotId},</if>
             <if test="cityId != null">#{cityId},</if>
             <if test="placeNum != null">#{placeNum},</if>
@@ -65,6 +96,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateParkingArea" parameterType="ParkingArea">
         update parking_area
         <trim prefix="SET" suffixOverrides=",">
+            <if test="areaName != null">area_name = #{areaName},</if>
             <if test="lotId != null">lot_id = #{lotId},</if>
             <if test="cityId != null">city_id = #{cityId},</if>
             <if test="placeNum != null">place_num = #{placeNum},</if>

@@ -8,10 +8,10 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 区域管理对象 parking_area
+ * 区域对象 parking_area
  * 
  * @author zhd
- * @date 2022-03-24
+ * @date 2022-04-01
  */
 public class ParkingArea extends BaseEntity
 {
@@ -19,6 +19,10 @@ public class ParkingArea extends BaseEntity
 
     /** 区域id */
     private Long areaId;
+
+    /** 区域名称 */
+    @Excel(name = "区域名称")
+    private String areaName;
 
     /** 车场id */
     @Excel(name = "车场id")
@@ -29,8 +33,6 @@ public class ParkingArea extends BaseEntity
     /** 城区id */
     @Excel(name = "城区id")
     private Long cityId;
-
-    private SysCity city;
 
     /** 泊位数量 */
     @Excel(name = "泊位数量")
@@ -51,6 +53,15 @@ public class ParkingArea extends BaseEntity
     public Long getAreaId() 
     {
         return areaId;
+    }
+    public void setAreaName(String areaName) 
+    {
+        this.areaName = areaName;
+    }
+
+    public String getAreaName() 
+    {
+        return areaName;
     }
     public void setLotId(String lotId) 
     {
@@ -98,16 +109,6 @@ public class ParkingArea extends BaseEntity
         return delFlag;
     }
 
-    public SysCity getCity()
-    {
-        return city;
-    }
-
-    public void setCity(SysCity city)
-    {
-        this.city = city;
-    }
-
     public ParkingLot getLot()
     {
         return lot;
@@ -122,6 +123,7 @@ public class ParkingArea extends BaseEntity
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("areaId", getAreaId())
+            .append("areaName", getAreaName())
             .append("lotId", getLotId())
             .append("cityId", getCityId())
             .append("placeNum", getPlaceNum())
@@ -131,8 +133,7 @@ public class ParkingArea extends BaseEntity
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
-            .append("city", getCity())
-            .append("lot", getLot())
+                .append("lot",getLot())
             .toString();
     }
 }

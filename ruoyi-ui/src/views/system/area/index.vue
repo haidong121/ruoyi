@@ -1,22 +1,23 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="车场id" prop="lotId">
+      <el-form-item label="区域名称" prop="areaName">
+        <el-input
+          v-model="queryParams.areaName"
+          placeholder="请输入区域名称"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="所属车场" prop="lotId">
         <el-input
           v-model="queryParams.lotId"
-          placeholder="请输入车场id"
+          placeholder="请输入车场名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="城区id" prop="cityId">
-        <el-input
-          v-model="queryParams.cityId"
-          placeholder="请输入城区id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+
       <el-form-item label="泊位数量" prop="placeNum">
         <el-input
           v-model="queryParams.placeNum"
@@ -25,14 +26,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="显示顺序" prop="orderNum">
-        <el-input
-          v-model="queryParams.orderNum"
-          placeholder="请输入显示顺序"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -87,11 +81,10 @@
 
     <el-table v-loading="loading" :data="areaList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="区域id" align="center" prop="areaId" />
-      <el-table-column label="车场id" align="center" prop="lotId" />
-      <el-table-column label="城区id" align="center" prop="cityId" />
+      <el-table-column label="区域编号" align="center" prop="areaId" />
+      <el-table-column label="区域名称" align="center" prop="areaName" />
+      <el-table-column label="所属车场" align="center" prop="lot.lotName" />
       <el-table-column label="泊位数量" align="center" prop="placeNum" />
-      <el-table-column label="显示顺序" align="center" prop="orderNum" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -111,7 +104,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -120,14 +113,21 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改区域管理对话框 -->
+    <!-- 添加或修改区域对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="车场id" prop="lotId">
-          <el-input v-model="form.lotId" placeholder="请输入车场id" />
+        <el-form-item label="区域名称" prop="areaName">
+          <el-input v-model="form.areaName" placeholder="请输入区域名称" />
         </el-form-item>
-        <el-form-item label="城区id" prop="cityId">
-          <el-input v-model="form.cityId" placeholder="请输入城区id" />
+        <el-form-item label="所属车场" >
+          <el-select v-model="form.lotId"  placeholder="请选择所属车场" >
+            <el-option
+              v-for="item in lotList"
+              :key="item.lotId"
+              :label="item.lotName"
+              :value="item.lotId"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="泊位数量" prop="placeNum">
           <el-input v-model="form.placeNum" placeholder="请输入泊位数量" />
@@ -135,8 +135,16 @@
         <el-form-item label="显示顺序" prop="orderNum">
           <el-input v-model="form.orderNum" placeholder="请输入显示顺序" />
         </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
+
+        <el-form-item label="删除标志">
+          <el-select v-model="form.delFlag" placeholder="请输入删除标志">
+            <el-option
+              v-for="dict in dict.type.del_flag"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -149,11 +157,15 @@
 
 <script>
 import { listArea, getArea, delArea, addArea, updateArea } from "@/api/system/area";
+import { listLot } from "@/api/system/lot";
 
 export default {
   name: "Area",
+  dicts: ['sys_common_status','lot_style','status','del_flag'],
   data() {
     return {
+      //车场列表
+      lotList:[],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -166,7 +178,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 区域管理表格数据
+      // 区域表格数据
       areaList: [],
       // 弹出层标题
       title: "",
@@ -176,6 +188,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        areaName: null,
         lotId: null,
         cityId: null,
         placeNum: null,
@@ -190,9 +203,19 @@ export default {
   },
   created() {
     this.getList();
+    this.getLotList();
   },
   methods: {
-    /** 查询区域管理列表 */
+    /** 查询车场管理列表 */
+    getLotList() {
+      this.loading = true;
+      listLot(this.queryParams).then(response => {
+        this.lotList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
+    /** 查询区域列表 */
     getList() {
       this.loading = true;
       listArea(this.queryParams).then(response => {
@@ -210,6 +233,7 @@ export default {
     reset() {
       this.form = {
         areaId: null,
+        areaName: null,
         lotId: null,
         cityId: null,
         placeNum: null,
@@ -242,7 +266,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加区域管理";
+      this.title = "添加区域";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -251,7 +275,7 @@ export default {
       getArea(areaId).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改区域管理";
+        this.title = "修改区域";
       });
     },
     /** 提交按钮 */
@@ -277,7 +301,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const areaIds = row.areaId || this.ids;
-      this.$modal.confirm('是否确认删除区域管理编号为"' + areaIds + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除区域编号为"' + areaIds + '"的数据项？').then(function() {
         return delArea(areaIds);
       }).then(() => {
         this.getList();

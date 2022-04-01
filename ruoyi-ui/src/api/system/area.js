@@ -1,6 +1,7 @@
 import request from '@/utils/request'
+import { parseStrEmpty } from "@/utils/ruoyi";
 
-// 查询区域管理列表
+// 查询区域列表
 export function listArea(query) {
   return request({
     url: '/system/area/list',
@@ -9,15 +10,23 @@ export function listArea(query) {
   })
 }
 
-// 查询区域管理详细
+// 查询区域详细
 export function getArea(areaId) {
   return request({
-    url: '/system/area/' + areaId,
+    url: '/system/area/area' + areaId,
     method: 'get'
   })
 }
 
-// 新增区域管理
+// 查询区域详细
+export function getAreaByLot(lotId) {
+  return request({
+    url: '/system/area/' + parseStrEmpty(lotId),
+    method: 'get'
+  })
+}
+
+// 新增区域
 export function addArea(data) {
   return request({
     url: '/system/area',
@@ -26,7 +35,7 @@ export function addArea(data) {
   })
 }
 
-// 修改区域管理
+// 修改区域
 export function updateArea(data) {
   return request({
     url: '/system/area',
@@ -35,7 +44,7 @@ export function updateArea(data) {
   })
 }
 
-// 删除区域管理
+// 删除区域
 export function delArea(areaId) {
   return request({
     url: '/system/area/' + areaId,

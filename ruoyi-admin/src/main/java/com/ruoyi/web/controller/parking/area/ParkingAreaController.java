@@ -2,16 +2,10 @@ package com.ruoyi.web.controller.parking.area;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -47,6 +41,19 @@ public class ParkingAreaController extends BaseController
     }
 
     /**
+     * 获取区域管理详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('system:area:list')")
+    @GetMapping(value = { "/", "/{lotId}" })
+    public TableDataInfo list(@PathVariable("lotId") Long lotId)
+    {
+        System.out.println(lotId);
+        startPage();
+        List<ParkingArea> list = parkingAreaService.selectParkingAreaByLotId(lotId);
+        return getDataTable(list);
+    }
+
+    /**
      * 导出区域管理列表
      */
     @PreAuthorize("@ss.hasPermi('system:area:export')")
@@ -63,11 +70,12 @@ public class ParkingAreaController extends BaseController
      * 获取区域管理详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:area:query')")
-    @GetMapping(value = "/{areaId}")
+    @GetMapping("/area/{areaId}")
     public AjaxResult getInfo(@PathVariable("areaId") Long areaId)
     {
         return AjaxResult.success(parkingAreaService.selectParkingAreaByAreaId(areaId));
     }
+
 
     /**
      * 新增区域管理
