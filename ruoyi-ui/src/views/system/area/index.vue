@@ -1,152 +1,124 @@
 <template>
   <div class="app-container">
-    <el-row :gutter="20">
-      <!--城区数据-->
-      <el-col :span="4" :xs="24">
-        <div class="head-container">
-          <el-input
-            v-model="cityName"
-            placeholder="请输入城区名称"
-            clearable
-            size="small"
-            prefix-icon="el-icon-search"
-            style="margin-bottom: 20px"
-          />
-        </div>
-        <div class="head-container">
-          <el-tree
-            :data="cityOptions"
-            :props="defaultProps"
-            :expand-on-click-node="false"
-            :filter-node-method="filterNode"
-            ref="tree"
-            default-expand-all
-            @node-click="handleNodeClick"
-          />
-        </div>
-      </el-col>
-      <el-col :span="20" :xs="24">
-        <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-          <el-form-item label="车场id" prop="lotId">
-            <el-input
-              v-model="queryParams.lotId"
-              placeholder="请输入车场id"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item label="城区id" prop="cityId">
-            <el-input
-              v-model="queryParams.cityId"
-              placeholder="请输入城区id"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item label="泊位数量" prop="placeNum">
-            <el-input
-              v-model="queryParams.placeNum"
-              placeholder="请输入泊位数量"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item label="显示顺序" prop="orderNum">
-            <el-input
-              v-model="queryParams.orderNum"
-              placeholder="请输入显示顺序"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          </el-form-item>
-        </el-form>
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="车场id" prop="lotId">
+        <el-input
+          v-model="queryParams.lotId"
+          placeholder="请输入车场id"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="城区id" prop="cityId">
+        <el-input
+          v-model="queryParams.cityId"
+          placeholder="请输入城区id"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="泊位数量" prop="placeNum">
+        <el-input
+          v-model="queryParams.placeNum"
+          placeholder="请输入泊位数量"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="显示顺序" prop="orderNum">
+        <el-input
+          v-model="queryParams.orderNum"
+          placeholder="请输入显示顺序"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
 
-      <el-row :gutter="10" class="mb8">
-        <el-col :span="1.5">
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+          v-hasPermi="['system:area:add']"
+        >新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          plain
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['system:area:edit']"
+        >修改</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          plain
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['system:area:remove']"
+        >删除</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          plain
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['system:area:export']"
+        >导出</el-button>
+      </el-col>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
+
+    <el-table v-loading="loading" :data="areaList" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column label="区域id" align="center" prop="areaId" />
+      <el-table-column label="车场id" align="center" prop="lotId" />
+      <el-table-column label="城区id" align="center" prop="cityId" />
+      <el-table-column label="泊位数量" align="center" prop="placeNum" />
+      <el-table-column label="显示顺序" align="center" prop="orderNum" />
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
           <el-button
-            type="primary"
-            plain
-            icon="el-icon-plus"
             size="mini"
-            @click="handleAdd"
-            v-hasPermi="['system:area:add']"
-          >新增</el-button>
-        </el-col>
-        <el-col :span="1.5">
-          <el-button
-            type="success"
-            plain
+            type="text"
             icon="el-icon-edit"
-            size="mini"
-            :disabled="single"
-            @click="handleUpdate"
+            @click="handleUpdate(scope.row)"
             v-hasPermi="['system:area:edit']"
           >修改</el-button>
-        </el-col>
-        <el-col :span="1.5">
           <el-button
-            type="danger"
-            plain
-            icon="el-icon-delete"
             size="mini"
-            :disabled="multiple"
-            @click="handleDelete"
+            type="text"
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)"
             v-hasPermi="['system:area:remove']"
           >删除</el-button>
-        </el-col>
-        <el-col :span="1.5">
-          <el-button
-            type="warning"
-            plain
-            icon="el-icon-download"
-            size="mini"
-            @click="handleExport"
-            v-hasPermi="['system:area:export']"
-          >导出</el-button>
-        </el-col>
-        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
-
-      <el-table v-loading="loading" :data="areaList" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="区域id" align="center" prop="areaId" />
-        <el-table-column label="车场名称" align="center" prop="lot.lotName" />
-        <el-table-column label="所属城区" align="center" prop="city.cityName" />
-        <el-table-column label="泊位数量" align="center" prop="placeNum" />
-        <el-table-column label="显示顺序" align="center" prop="orderNum" />
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-edit"
-              @click="handleUpdate(scope.row)"
-              v-hasPermi="['system:area:edit']"
-            >修改</el-button>
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-delete"
-              @click="handleDelete(scope.row)"
-              v-hasPermi="['system:area:remove']"
-            >删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <pagination
-        v-show="total>0"
-        :total="total"
-        :page.sync="queryParams.pageNum"
-        :limit.sync="queryParams.pageSize"
-        @pagination="getList"
-      />
-      </el-col>
-    </el-row>
+        </template>
+      </el-table-column>
+    </el-table>
+    
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize"
+      @pagination="getList"
+    />
 
     <!-- 添加或修改区域管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -154,26 +126,17 @@
         <el-form-item label="车场id" prop="lotId">
           <el-input v-model="form.lotId" placeholder="请输入车场id" />
         </el-form-item>
-
-          <el-form-item label="归属城区" prop="cityId">
-            <treeselect v-model="form.cityId" :options="cityOptions" :show-count="true" placeholder="请选择归属城区" />
-          </el-form-item>
-
+        <el-form-item label="城区id" prop="cityId">
+          <el-input v-model="form.cityId" placeholder="请输入城区id" />
+        </el-form-item>
         <el-form-item label="泊位数量" prop="placeNum">
           <el-input v-model="form.placeNum" placeholder="请输入泊位数量" />
         </el-form-item>
         <el-form-item label="显示顺序" prop="orderNum">
           <el-input v-model="form.orderNum" placeholder="请输入显示顺序" />
         </el-form-item>
-        <el-form-item label="删除标志">
-          <el-select v-model="form.delFlag" placeholder="请输入删除标志">
-            <el-option
-              v-for="dict in dict.type.del_flag"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            ></el-option>
-          </el-select>
+        <el-form-item label="删除标志" prop="delFlag">
+          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -186,24 +149,11 @@
 
 <script>
 import { listArea, getArea, delArea, addArea, updateArea } from "@/api/system/area";
-import {treeselect} from "@/api/system/city";
-import Treeselect from "@riophae/vue-treeselect";
-import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
   name: "Area",
-  dicts: ['sys_common_status','lot_style','status','del_flag'],
-  components: { Treeselect },
   data() {
     return {
-      // 城区名称
-      cityName: undefined,
-      // 城区树选项
-      cityOptions: undefined,
-      defaultProps: {
-        children: "children",
-        label: "label"
-      },
       // 遮罩层
       loading: true,
       // 选中数组
@@ -240,35 +190,8 @@ export default {
   },
   created() {
     this.getList();
-    this.getTreeselect();
   },
-
-  watch: {
-    // 根据名称筛选部门树
-    cityName(val) {
-      this.$refs.tree.filter(val);
-    }
-  },
-
   methods: {
-
-    /** 查询部门下拉树结构 */
-    getTreeselect() {
-      treeselect().then(response => {
-        this.cityOptions = response.data;
-      });
-    },
-    // 筛选节点
-    filterNode(value, data) {
-      if (!value) return true;
-      return data.label.indexOf(value) !== -1;
-    },
-    // 节点单击事件
-    handleNodeClick(data) {
-      this.queryParams.cityId = data.id;
-      this.handleQuery();
-    },
-
     /** 查询区域管理列表 */
     getList() {
       this.loading = true;

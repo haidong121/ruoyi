@@ -15,48 +15,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
-        <association property="city"    column="city_id" javaType="SysCity" resultMap="SysCityResult" />
-        <association property="lot"    column="lot_id" javaType="ParkingLot" resultMap="ParkingLotResult" />
-    </resultMap>
-
-    <resultMap type="ParkingLot" id="ParkingLotResult">
-        <result property="lotId"    column="lot_id"    />
-        <result property="lotName"    column="lot_name"    />
-        <result property="shortName"    column="short_name"    />
-        <result property="cityId"    column="city_id"    />
-        <result property="address"    column="address"    />
-        <result property="placeNum"    column="place_num"    />
-        <result property="lotStyle"    column="lot_style"    />
-        <result property="orderNum"    column="order_num"    />
-        <result property="buildTime"    column="build_time"    />
-        <result property="status"    column="status"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"    column="update_time"    />
-        <association property="city"    column="city_id" javaType="SysCity" resultMap="SysCityResult" />
-    </resultMap>
-
-    <resultMap type="SysCity" id="SysCityResult">
-        <result property="cityId"    column="city_id"    />
-        <result property="parentId"    column="parent_id"    />
-        <result property="ancestors"    column="ancestors"    />
-        <result property="cityName"    column="city_name"    />
-        <result property="orderNum"    column="order_num"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"    column="update_time"    />
     </resultMap>
 
     <sql id="selectParkingAreaVo">
-        select a.area_id, a.lot_id, a.city_id, a.place_num, a.order_num, a.del_flag, a.create_by, a.create_time, a.update_by, a.update_time,
-               c.city_name, l.lot_name
-        from parking_area a
-        		    left join sys_city c on
-		            left join parking_lot l on
+        select area_id, lot_id, city_id, place_num, order_num, del_flag, create_by, create_time, update_by, update_time from parking_area
     </sql>
 
     <select id="selectParkingAreaList" parameterType="ParkingArea" resultMap="ParkingAreaResult">
