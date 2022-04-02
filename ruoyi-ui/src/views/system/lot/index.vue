@@ -128,8 +128,23 @@
 
     <el-table v-loading="loading" :data="lotList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="车场id" align="center" prop="lotId" />
-      <el-table-column label="车场名称" align="center" prop="lotName" />
+      <el-table-column label="车场编号" align="center" prop="lotId" />
+<!--      <el-table-column label="车场名称" align="center" prop="lotName" >-->
+<!--        <template slot-scope="scope">-->
+<!--          <router-link :to="'/system/dict-data/index/' + scope.row.dictId" class="link-type">-->
+<!--            <span>{{ scope.row.dictType }}</span>-->
+<!--          </router-link>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+
+      <el-table-column label="车场名称" align="center" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <router-link :to="'/system/lot-date/index/' + scope.row.lotId" class="link-type">
+            <span>{{ scope.row.lotName }}</span>
+          </router-link>
+        </template>
+      </el-table-column>
+
       <el-table-column label="车场简称" align="center" prop="shortName" />
       <el-table-column label="所属城区" align="center" prop="city.cityName" />
       <el-table-column label="详细地址" align="center" prop="address" />
@@ -203,12 +218,12 @@
         </el-form-item>
 
         <el-form-item label="车场类型">
-          <el-select v-model="form.lotStyle" placeholder="请输入车场类型">
+          <el-select v-model="form.lotStyle"  placeholder="请输入车场类型">
             <el-option
               v-for="dict in dict.type.lot_style"
               :key="dict.value"
               :label="dict.label"
-              :value="dict.value"
+              :value="Number(dict.value)"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -386,6 +401,8 @@ export default {
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
+      this.queryParams.cityId=null;
+      this.getList();
     },
     // 多选框选中数据
     handleSelectionChange(selection) {

@@ -13,7 +13,7 @@ export function listArea(query) {
 // 查询区域详细
 export function getArea(areaId) {
   return request({
-    url: '/system/area/area' + areaId,
+    url: '/system/area/' + areaId,
     method: 'get'
   })
 }
@@ -21,7 +21,7 @@ export function getArea(areaId) {
 // 查询区域详细
 export function getAreaByLot(lotId) {
   return request({
-    url: '/system/area/' + parseStrEmpty(lotId),
+    url: '/system/area/lot/' + parseStrEmpty(lotId),
     method: 'get'
   })
 }

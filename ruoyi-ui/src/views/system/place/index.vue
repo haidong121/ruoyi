@@ -173,7 +173,7 @@
               v-for="item in areaList"
               :key="item.areaId"
               :label="item.areaName"
-              :value="item.areaId"
+              :value="Number(item.areaId)"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -306,7 +306,6 @@ export default {
       this.loading = true;
       listPlace(this.queryParams).then(response => {
         this.placeList = response.rows;
-        alert(JSON.stringify(this.placeList))
         this.total = response.total;
         this.loading = false;
       });
@@ -359,7 +358,13 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const placeId = row.placeId || this.ids
+      const placeId = row.placeId || this.ids;
+      const lotId = row.lotId;
+      getAreaByLot(lotId).then(response => {
+        this.areaList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
       getPlace(placeId).then(response => {
         this.form = response.data;
         this.open = true;

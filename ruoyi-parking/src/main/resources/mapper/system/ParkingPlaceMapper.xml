@@ -41,6 +41,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <resultMap type="ParkingArea" id="ParkingAreaResult">
         <result property="areaId"    column="area_id"    />
+        <result property="areaName"    column="area_name"    />
         <result property="lotId"    column="lot_id"    />
         <result property="cityId"    column="city_id"    />
         <result property="placeNum"    column="place_num"    />

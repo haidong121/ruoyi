@@ -135,6 +135,20 @@ export const dynamicRoutes = [
     ]
   },
   {
+    path: '/system/lot-date',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:lot:list'],
+    children: [
+      {
+        path: 'index/:lotId(\\d+)',
+        component: () => import('@/views/system/lot/date'),
+        name: 'Data',
+        meta: { title: '车场详情', activeMenu: '/system/lot' }
+      }
+    ]
+  },
+  {
     path: '/monitor/job-log',
     component: Layout,
     hidden: true,
