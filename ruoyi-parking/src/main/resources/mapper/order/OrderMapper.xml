@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.parking.order.mapper.OrderMapper">
+    
+    <resultMap type="Order" id="OrderResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="cityId"    column="city_id"    />
+        <result property="lotId"    column="lot_id"    />
+        <result property="placeId"    column="place_id"    />
+        <result property="carId"    column="car_id"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="duration"    column="duration"    />
+        <result property="orderStatus"    column="order_status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="params.lotName"    column="lot_name"    />
+        <association property="parkingLot"    column="lot_id" javaType="ParkingLot" resultMap="ParkingLotResult" />
+    </resultMap>
+
+    <resultMap id="OrderParkingLotResult" type="Order" extends="OrderResult">
+        <collection property="parkingLotList" notNullColumn="sub_lot_id" javaType="java.util.List" resultMap="ParkingLotResult" />
+    </resultMap>
+
+    <resultMap type="ParkingLot" id="ParkingLotResult">
+        <result property="lotId"    column="sub_lot_id"    />
+        <result property="shortName"    column="sub_short_name"    />
+        <result property="cityId"    column="sub_city_id"    />
+        <result property="address"    column="sub_address"    />
+        <result property="placeNum"    column="sub_place_num"    />
+        <result property="lotStyle"    column="sub_lot_style"    />
+        <result property="orderNum"    column="sub_order_num"    />
+        <result property="buildTime"    column="sub_build_time"    />
+        <result property="status"    column="sub_status"    />
+        <result property="delFlag"    column="sub_del_flag"    />
+        <result property="createBy"    column="sub_create_by"    />
+        <result property="createTime"    column="sub_create_time"    />
+        <result property="updateBy"    column="sub_update_by"    />
+        <result property="updateTime"    column="sub_update_time"    />
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        select o.order_id, o.city_id, o.lot_id,o.place_id, o.car_id, o.start_time, o.end_time, o.duration, o.order_status, o.del_flag, o.create_by, o.create_time, o.update_by, o.update_time, p.lot_name
+        from `order` o
+            left join parking_lot p on o.lot_id = p.lot_id
+    </sql>
+
+    <select id="selectOrderList" parameterType="Order" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        <where>
+            <if test="cityId != null "> and city_id = #{cityId}</if>
+            <if test="lotId != null "> and lot_id = #{lotId}</if>
+            <if test="placeId != null "> and place_id = #{placeId}</if>
+            <if test="carId != null "> and car_id = #{carId}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+            <if test="duration != null "> and duration = #{duration}</if>
+            <if test="orderStatus != null  and orderStatus != ''"> and order_status = #{orderStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectOrderByOrderId" parameterType="Long" resultMap="OrderParkingLotResult">
+        select a.order_id, a.city_id, a.lot_id, a.place_id, a.car_id, a.start_time, a.end_time, a.duration, a.order_status, a.del_flag, a.create_by, a.create_time, a.update_by, a.update_time,
+ b.lot_id as sub_lot_id, b.lot_name as sub_lot_name, b.short_name as sub_short_name, b.city_id as sub_city_id, b.address as sub_address, b.place_num as sub_place_num, b.lot_style as sub_lot_style, b.order_num as sub_order_num, b.build_time as sub_build_time, b.status as sub_status, b.del_flag as sub_del_flag, b.create_by as sub_create_by, b.create_time as sub_create_time, b.update_by as sub_update_by, b.update_time as sub_update_time
+        from `order` a
+        left join parking_lot b on b.lot_id = a.order_id
+        where a.order_id = #{orderId}
+    </select>
+        
+    <insert id="insertOrder" parameterType="Order" useGeneratedKeys="true" keyProperty="orderId">
+        insert into `order`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cityId != null">city_id,</if>
+            <if test="lotId != null">lot_id,</if>
+            <if test="placeId != null">place_id,</if>
+            <if test="carId != null">car_id,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="duration != null">duration,</if>
+            <if test="orderStatus != null">order_status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cityId != null">#{cityId},</if>
+            <if test="lotId != null">#{lotId},</if>
+            <if test="placeId != null">#{placeId},</if>
+            <if test="carId != null">#{carId},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="duration != null">#{duration},</if>
+            <if test="orderStatus != null">#{orderStatus},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOrder" parameterType="Order">
+        update `order`
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cityId != null">city_id = #{cityId},</if>
+            <if test="lotId != null">lot_id = #{lotId},</if>
+            <if test="placeId != null">place_id = #{placeId},</if>
+            <if test="carId != null">car_id = #{carId},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="orderStatus != null">order_status = #{orderStatus},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteOrderByOrderId" parameterType="Long">
+        delete from `order` where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteOrderByOrderIds" parameterType="String">
+        delete from `order` where order_id in
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteParkingLotByLotIds" parameterType="String">
+        delete from parking_lot where lot_id in
+        <foreach item="lotId" collection="array" open="(" separator="," close=")">
+            #{lotId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteParkingLotByLotId" parameterType="Long">
+        delete from parking_lot where lot_id = #{lotId}
+    </delete>
+
+    <insert id="batchParkingLot">
+        insert into parking_lot( lot_id, lot_name, short_name, city_id, address, place_num, lot_style, order_num, build_time, status, del_flag, create_by, create_time, update_by, update_time) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.lotId}, #{item.lotName}, #{item.shortName}, #{item.cityId}, #{item.address}, #{item.placeNum}, #{item.lotStyle}, #{item.orderNum}, #{item.buildTime}, #{item.status}, #{item.delFlag}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime})
+        </foreach>
+    </insert>
+</mapper>

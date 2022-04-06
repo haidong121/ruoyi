@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.parking.settlement.mapper.SysSettlementMapper">
+    
+    <resultMap type="SysSettlement" id="SysSettlementResult">
+        <result property="settlementId"    column="settlement_id"    />
+        <result property="settlementName"    column="settlement_name"    />
+        <result property="cityId"    column="city_id"    />
+        <result property="settlementPeriod"    column="settlement_period"    />
+        <result property="businessLicense"    column="business_license"    />
+        <result property="address"    column="address"    />
+        <result property="accountName"    column="account_name"    />
+        <result property="accountBank"    column="account_bank"    />
+        <result property="leader"    column="leader"    />
+        <result property="phone"    column="phone"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="SysSettlementOrderResult" type="SysSettlement" extends="SysSettlementResult">
+        <collection property="orderList" notNullColumn="sub_order_id" javaType="java.util.List" resultMap="OrderResult" />
+    </resultMap>
+
+    <resultMap type="Order" id="OrderResult">
+        <result property="orderId"    column="sub_order_id"    />
+        <result property="cityId"    column="sub_city_id"    />
+        <result property="lotId"    column="sub_lot_id"    />
+        <result property="placeId"    column="sub_place_id"    />
+        <result property="carId"    column="sub_car_id"    />
+        <result property="startTime"    column="sub_start_time"    />
+        <result property="endTime"    column="sub_end_time"    />
+        <result property="duration"    column="sub_duration"    />
+        <result property="orderStatus"    column="sub_order_status"    />
+        <result property="delFlag"    column="sub_del_flag"    />
+        <result property="createBy"    column="sub_create_by"    />
+        <result property="createTime"    column="sub_create_time"    />
+        <result property="updateBy"    column="sub_update_by"    />
+        <result property="updateTime"    column="sub_update_time"    />
+    </resultMap>
+
+    <sql id="selectSysSettlementVo">
+        select settlement_id, settlement_name, city_id, settlement_period, business_license, address, account_name, account_bank, leader, phone, create_by, create_time, update_by, update_time from sys_settlement
+    </sql>
+
+    <select id="selectSysSettlementList" parameterType="SysSettlement" resultMap="SysSettlementResult">
+        <include refid="selectSysSettlementVo"/>
+        <where>  
+            <if test="settlementName != null  and settlementName != ''"> and settlement_name like concat('%', #{settlementName}, '%')</if>
+            <if test="cityId != null "> and city_id = #{cityId}</if>
+            <if test="settlementPeriod != null "> and settlement_period = #{settlementPeriod}</if>
+            <if test="businessLicense != null "> and business_license = #{businessLicense}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="accountName != null  and accountName != ''"> and account_name like concat('%', #{accountName}, '%')</if>
+            <if test="accountBank != null  and accountBank != ''"> and account_bank = #{accountBank}</if>
+            <if test="leader != null  and leader != ''"> and leader = #{leader}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysSettlementBySettlementId" parameterType="Long" resultMap="SysSettlementOrderResult">
+        select a.settlement_id, a.settlement_name, a.city_id, a.settlement_period, a.business_license, a.address, a.account_name, a.account_bank, a.leader, a.phone, a.create_by, a.create_time, a.update_by, a.update_time,
+ b.order_id as sub_order_id, b.city_id as sub_city_id, b.lot_id as sub_lot_id, b.place_id as sub_place_id, b.car_id as sub_car_id, b.start_time as sub_start_time, b.end_time as sub_end_time, b.duration as sub_duration, b.order_status as sub_order_status, b.del_flag as sub_del_flag, b.create_by as sub_create_by, b.create_time as sub_create_time, b.update_by as sub_update_by, b.update_time as sub_update_time
+        from sys_settlement a
+        left join `order` b on b.order_id = a.settlement_id
+        where a.settlement_id = #{settlementId}
+    </select>
+        
+    <insert id="insertSysSettlement" parameterType="SysSettlement" useGeneratedKeys="true" keyProperty="settlementId">
+        insert into sys_settlement
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="settlementName != null">settlement_name,</if>
+            <if test="cityId != null">city_id,</if>
+            <if test="settlementPeriod != null">settlement_period,</if>
+            <if test="businessLicense != null">business_license,</if>
+            <if test="address != null">address,</if>
+            <if test="accountName != null">account_name,</if>
+            <if test="accountBank != null">account_bank,</if>
+            <if test="leader != null">leader,</if>
+            <if test="phone != null">phone,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="settlementName != null">#{settlementName},</if>
+            <if test="cityId != null">#{cityId},</if>
+            <if test="settlementPeriod != null">#{settlementPeriod},</if>
+            <if test="businessLicense != null">#{businessLicense},</if>
+            <if test="address != null">#{address},</if>
+            <if test="accountName != null">#{accountName},</if>
+            <if test="accountBank != null">#{accountBank},</if>
+            <if test="leader != null">#{leader},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysSettlement" parameterType="SysSettlement">
+        update sys_settlement
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="settlementName != null">settlement_name = #{settlementName},</if>
+            <if test="cityId != null">city_id = #{cityId},</if>
+            <if test="settlementPeriod != null">settlement_period = #{settlementPeriod},</if>
+            <if test="businessLicense != null">business_license = #{businessLicense},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="accountName != null">account_name = #{accountName},</if>
+            <if test="accountBank != null">account_bank = #{accountBank},</if>
+            <if test="leader != null">leader = #{leader},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where settlement_id = #{settlementId}
+    </update>
+
+    <delete id="deleteSysSettlementBySettlementId" parameterType="Long">
+        delete from sys_settlement where settlement_id = #{settlementId}
+    </delete>
+
+    <delete id="deleteSysSettlementBySettlementIds" parameterType="String">
+        delete from sys_settlement where settlement_id in 
+        <foreach item="settlementId" collection="array" open="(" separator="," close=")">
+            #{settlementId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteOrderByOrderIds" parameterType="String">
+        delete from `order` where order_id in
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteOrderByOrderId" parameterType="Long">
+        delete from `order` where order_id = #{orderId}
+    </delete>
+
+    <insert id="batchOrder">
+        insert into `order`( order_id, city_id, lot_id, place_id, car_id, start_time, end_time, duration, order_status, del_flag, create_by, create_time, update_by, update_time) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.orderId}, #{item.cityId}, #{item.lotId}, #{item.placeId}, #{item.carId}, #{item.startTime}, #{item.endTime}, #{item.duration}, #{item.orderStatus}, #{item.delFlag}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime})
+        </foreach>
+    </insert>
+</mapper>
