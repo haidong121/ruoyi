@@ -48,12 +48,19 @@
           />
         </el-form-item>
         <el-form-item label="车场类型" prop="lotStyle">
-          <el-input
+          <el-select
             v-model="queryParams.lotStyle"
             placeholder="请输入车场类型"
             clearable
             @keyup.enter.native="handleQuery"
-          />
+          >
+            <el-option
+              v-for="dict in dict.type.lot_style"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </el-select>
         </el-form-item>
 
         <el-form-item label="建成时间" prop="buildTime">
@@ -217,7 +224,7 @@
           <el-input v-model="form.placeNum" placeholder="请输入泊位数量" />
         </el-form-item>
 
-        <el-form-item label="车场类型">
+        <el-form-item label="车场类型" label-width="80px">
           <el-select v-model="form.lotStyle"  placeholder="请输入车场类型">
             <el-option
               v-for="dict in dict.type.lot_style"
