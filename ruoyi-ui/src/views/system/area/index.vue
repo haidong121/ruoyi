@@ -9,14 +9,14 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="所属车场" prop="lotId">
-        <el-input
-          v-model="queryParams.lotId"
-          placeholder="请输入车场名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+<!--      <el-form-item label="所属车场" prop="lotId">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.lot.lotName"-->
+<!--          placeholder="请输入车场名称"-->
+<!--          clearable-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
 
       <el-form-item label="泊位数量" prop="placeNum">
         <el-input
@@ -82,7 +82,13 @@
     <el-table v-loading="loading" :data="areaList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="区域编号" align="center" prop="areaId" />
-      <el-table-column label="区域名称" align="center" prop="areaName" />
+      <el-table-column label="区域名称" align="center" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <router-link :to="'/system/area-data/index/' + scope.row.areaId" class="link-type">
+            <span>{{ scope.row.areaName }}</span>
+          </router-link>
+        </template>
+      </el-table-column>
       <el-table-column label="所属车场" align="center" prop="lot.lotName" />
       <el-table-column label="泊位数量" align="center" prop="placeNum" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">

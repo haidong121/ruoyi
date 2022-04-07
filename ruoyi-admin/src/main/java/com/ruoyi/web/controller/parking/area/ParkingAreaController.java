@@ -44,7 +44,7 @@ public class ParkingAreaController extends BaseController
      * 获取区域管理详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:area:list')")
-    @GetMapping(value = { "/", "/{lotId}" })
+    @GetMapping(value = "/lot/{lotId}" )
     public TableDataInfo list(@PathVariable("lotId") Long lotId)
     {
         System.out.println(lotId);
@@ -70,7 +70,7 @@ public class ParkingAreaController extends BaseController
      * 获取区域管理详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:area:query')")
-    @GetMapping("/area/{areaId}")
+    @GetMapping(value = "/{areaId}")
     public AjaxResult getInfo(@PathVariable("areaId") Long areaId)
     {
         return AjaxResult.success(parkingAreaService.selectParkingAreaByAreaId(areaId));

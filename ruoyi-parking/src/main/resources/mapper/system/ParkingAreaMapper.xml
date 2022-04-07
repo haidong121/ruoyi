@@ -49,9 +49,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="areaName != null  and areaName != ''"> and area_name like concat('%', #{areaName}, '%')</if>
             <if test="lotId != null  and lotId != ''"> and a.lot_id = #{lotId}</if>
-            <if test="cityId != null "> and city_id = #{cityId}</if>
-            <if test="placeNum != null "> and place_num = #{placeNum}</if>
-            <if test="orderNum != null "> and order_num = #{orderNum}</if>
+            <if test="cityId != null "> and a.city_id = #{cityId}</if>
+            <if test="placeNum != null "> and a.place_num = #{placeNum}</if>
+            <if test="orderNum != null "> and a.order_num = #{orderNum}</if>
         </where>
     </select>
 

@@ -1,22 +1,22 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="78px">
-      <el-form-item label="所属车场" prop="lotId">
-        <el-input
-          v-model="queryParams.lotId"
-          placeholder="请输入所属车场"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="所属区域" prop="areaId">
-        <el-input
-          v-model="queryParams.areaId"
-          placeholder="请输入所属区域"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+<!--      <el-form-item label="所属车场" prop="lotId">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.lotId"-->
+<!--          placeholder="请输入所属车场"-->
+<!--          clearable-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
+<!--      <el-form-item label="所属区域" prop="areaId">-->
+<!--        <el-input-->
+<!--          v-model="queryParams.areaId"-->
+<!--          placeholder="请输入所属区域"-->
+<!--          clearable-->
+<!--          @keyup.enter.native="handleQuery"-->
+<!--        />-->
+<!--      </el-form-item>-->
       <el-form-item label="设备SN码" prop="equipmentSncode">
         <el-input
           v-model="queryParams.equipmentSncode"
@@ -44,12 +44,14 @@
         </el-select>
       </el-form-item>
       <el-form-item label="泊位属性" prop="placeProperty">
-        <el-input
-          v-model="queryParams.placeProperty"
-          placeholder="请输入泊位属性"
-          clearable
-          @keyup.enter.native="handleQuery"
+        <el-select v-model="queryParams.placeProperty" placeholder="请输入泊位属性" clearable @keyup.enter.native="handleQuery">
+        <el-option
+          v-for="dict in dict.type.place_property"
+          :key="dict.value"
+          :label="dict.label"
+          :value="dict.value"
         />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -173,7 +175,7 @@
               v-for="item in areaList"
               :key="item.areaId"
               :label="item.areaName"
-              :value="item.areaId"
+              :value="Number(item.areaId)"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -306,7 +308,6 @@ export default {
       this.loading = true;
       listPlace(this.queryParams).then(response => {
         this.placeList = response.rows;
-        alert(JSON.stringify(this.placeList))
         this.total = response.total;
         this.loading = false;
       });
@@ -359,7 +360,13 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const placeId = row.placeId || this.ids
+      const placeId = row.placeId || this.ids;
+      const lotId = row.lotId;
+      getAreaByLot(lotId).then(response => {
+        this.areaList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
       getPlace(placeId).then(response => {
         this.form = response.data;
         this.open = true;

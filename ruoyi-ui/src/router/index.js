@@ -135,6 +135,34 @@ export const dynamicRoutes = [
     ]
   },
   {
+    path: '/system/lot-date',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:lot:list'],
+    children: [
+      {
+        path: 'index/:lotId(\\d+)',
+        component: () => import('@/views/system/lot/date'),
+        name: 'Date',
+        meta: { title: '车场详情', activeMenu: '/system/lot' }
+      }
+    ]
+  },
+  {
+    path: '/system/area-data',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:area:list'],
+    children: [
+      {
+        path: 'index/:areaId(\\d+)',
+        component: () => import('@/views/system/area/data'),
+        name: 'Data',
+        meta: { title: '区域详情', activeMenu: '/system/area' }
+      }
+    ]
+  },
+  {
     path: '/monitor/job-log',
     component: Layout,
     hidden: true,
