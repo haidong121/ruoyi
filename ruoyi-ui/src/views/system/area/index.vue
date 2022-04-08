@@ -84,7 +84,7 @@
       <el-table-column label="区域编号" align="center" prop="areaId" />
       <el-table-column label="区域名称" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <router-link :to="'/system/area-data/index/' + scope.row.areaId" class="link-type">
+          <router-link :to="'/system/area-data/index/' + scope.row.areaId  " class="link-type">
             <span>{{ scope.row.areaName }}</span>
           </router-link>
         </template>
