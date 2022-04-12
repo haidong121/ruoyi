@@ -46,7 +46,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectParkingLotList" parameterType="ParkingLot" resultMap="ParkingLotResult">
         <include refid="selectParkingLotVo"/>
-        <where>  
+        <where>
+            <if test="lotId != null  and lotId != ''"> and lot_id = #{lotId}</if>
             <if test="lotName != null  and lotName != ''"> and lot_name like concat('%', #{lotName}, '%')</if>
             <if test="shortName != null  and shortName != ''"> and short_name like concat('%', #{shortName}, '%')</if>
             <if test="cityId != null "> and p.city_id = #{cityId}</if>
